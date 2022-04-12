@@ -1,0 +1,64 @@
+version: '3'
+services:
+  zk-1:
+    image: zookeeper
+    restart: always
+    container_name: zk-1
+    networks:
+      - zk-net
+    ports:
+      - "2181:2181"
+    volumes:
+      - ./zookeeper/zk-1/data:/data
+      - ./zookeeper/zk-1/datalog:/datalog
+    environment:
+      # 分别运行三个 zookeeper 镜像, 分别将本地的 2181、2182、2183 三个端口绑定到对应的容器的2181端口
+      # ZOO_MY_ID 表示 ZK 服务的 id, 它是1-255 之间的整数, 必须在集群中唯一
+      # ZOO_SERVERS 是ZK 集群的主机列表.
+      ZOO_MY_ID: 1
+      # 代码访问client的端口号： 2181
+      # leader和flower通信的端口号： 2888
+      # 选举leader时通信的端口号： 3888
+      # 其他服务与监控中心通信端口： 7070
+      # 其实这个是有格式的
+      # service.N =YYY： A：B
+      # N：代表服务器编号（也就是myid里面的值）
+      # YYY：服务器地址
+      # A：表示 Flower 跟 Leader的通信端口，简称服务端内部通信的端口（默认2888）
+      # B：表示 是选举端口（默认是3888）
+      ZOO_SERVERS: server.1=zk-1:2888:3888;2181 server.2=zk-2:2888:3888;2181 server.3=zk-3:2888:3888;2181
+
+  zk-2:
+    image: zookeeper
+    restart: always
+    container_name: zk-2
+    networks:
+      - zk-net
+    ports:
+      - "2182:2181"
+    volumes:
+      - ./zookeeper/zk-2/data:/data
+      - ./zookeeper/zk-2/datalog:/datalog
+    environment:
+      ZOO_MY_ID: 2
+      ZOO_SERVERS: server.1=zk-1:2888:3888;2181 server.2=zk-2:2888:3888;2181 server.3=zk-3:2888:3888;2181
+
+  zk-3:
+    image: zookeeper
+    restart: always
+    container_name: zk-3
+    networks:
+      - zk-net
+    ports:
+      - "2183:2181"
+    volumes:
+      - ./zookeeper/zk-3/data:/data
+      - ./zookeeper/zk-3/datalog:/datalog
+    environment:
+      ZOO_MY_ID: 3
+      ZOO_SERVERS: server.1=zk-1:2888:3888;2181 server.2=zk-2:2888:3888;2181 server.3=zk-3:2888:3888;2181
+
+networks:
+  zk-net:
+    # 如果要创建外部隔离的覆盖网络，您可以将此internal选项设置为true
+    external: false

@@ -1,2 +1,2 @@
 # zk-docker
-zk canel
+docker安装zk
