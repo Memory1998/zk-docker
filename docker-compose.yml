@@ -58,6 +58,44 @@ services:
       ZOO_MY_ID: 3
       ZOO_SERVERS: server.1=zk-1:2888:3888;2181 server.2=zk-2:2888:3888;2181 server.3=zk-3:2888:3888;2181
 
+  canal-admin:
+    image: canal/canal-admin:v1.1.5
+    restart: always
+    container_name: canal-admin
+    networks:
+      - zk-net
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./canal/canal-admin/logs:/home/admin/canal-admin/logs
+      - type: bind
+        source: ./canal/canal-admin/conf/application.yml
+        target: /home/admin/canal-admin/conf/application.yml
+    environment:
+      ADDRESS: 192.168.2.218:3306
+      DATABASE: canal_manager
+      USERNAME: canal
+      PASSWORD: canal
+
+#
+#  canal-server:
+#    image: canal/canal-server:v1.1.5
+#    restart: always
+#    container_name: canal-server
+#    networks:
+#      - zk-net
+#    ports:
+#      - "2183:2181"
+#    volumes:
+#      - ./canal/canal-server/conf:conf
+#      - ./canal/canal-server/logs:logs
+#    environment:
+#      ZOO_MY_ID: 3
+#      ZOO_SERVERS: server.1=zk-1:2888:3888;2181 server.2=zk-2:2888:3888;2181 server.3=zk-3:2888:3888;2181
+#
+
+
+
 networks:
   zk-net:
     # 如果要创建外部隔离的覆盖网络，您可以将此internal选项设置为true
