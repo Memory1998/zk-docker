@@ -5,7 +5,6 @@ services:
   zk-mysql:
     image: mysql:5.7
     container_name: zk-mysql
-    hostname: zk-mysql
     networks:
       - zk-net
     restart: always
