@@ -1,5 +1,23 @@
 version: '3'
 services:
+
+  # 数据库5.7版本
+  zk-mysql:
+    image: mysql:5.7
+    container_name: zk-mysql
+    hostname: zk-mysql
+    networks:
+      - zk-net
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: canal_manager
+    ports:
+      - "33066:3306"
+    volumes:
+      - ./mysql/data/:/var/lib/mysql
+      - ./mysql/my.cnf:/etc/my.cnf
+
   zk-1:
     image: zookeeper
     restart: always
@@ -66,16 +84,22 @@ services:
       - zk-net
     ports:
       - "8089:8089"
+    depends_on:
+      - zk-mysql
+      - zk-1
+      - zk-2
+      - zk-3
     volumes:
       - ./canal/canal-admin/logs:/home/admin/canal-admin/logs
       - type: bind
         source: ./canal/canal-admin/conf/application.yml
         target: /home/admin/canal-admin/conf/application.yml
     environment:
-      ADDRESS: 192.168.2.218:3306
+      ADDRESS: 192.168.2.218
+      PORT: 33066
       DATABASE: canal_manager
-      USERNAME: canal
-      PASSWORD: canal
+      USERNAME: root
+      PASSWORD: root
 
 #
 #  canal-server:

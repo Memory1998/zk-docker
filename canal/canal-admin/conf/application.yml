@@ -6,12 +6,13 @@ spring:
     time-zone: GMT+8
 
 spring.datasource:
-  address: ${ADDRESS:127.0.0.1:3306}
+  address: ${ADDRESS:127.0.0.1}
+  port: ${PORT:3306}
   database: ${DATABASE:canal_manager}
   username: ${USERNAME:canal}
   password: ${PASSWORD:canal}
   driver-class-name: com.mysql.jdbc.Driver
-  url: jdbc:mysql://${spring.datasource.address}/${spring.datasource.database}?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+  url: jdbc:mysql://${spring.datasource.address}:${spring.datasource.port}/${spring.datasource.database}?useUnicode=true&characterEncoding=UTF-8&useSSL=false
   hikari:
     maximum-pool-size: 30
     minimum-idle: 1
