@@ -83,6 +83,7 @@ services:
       - zk-net
     ports:
       - "8089:8089"
+      - "11110:11110"
     depends_on:
       - zk-mysql
       - zk-1
@@ -90,34 +91,35 @@ services:
       - zk-3
     volumes:
       - ./canal/canal-admin/logs:/home/admin/canal-admin/logs
-      - type: bind
-        source: ./canal/canal-admin/conf/application.yml
-        target: /home/admin/canal-admin/conf/application.yml
+      # - type: bind
+      #     source: ./canal/canal-admin/conf/application.yml
+      #     target: /home/admin/canal-admin/conf/application.yml
     environment:
-      ADDRESS: 192.168.2.218
-      PORT: 33066
-      DATABASE: canal_manager
-      USERNAME: root
-      PASSWORD: root
+      - server.port=8089
+      - canal.adminUser=admin
+      - canal.adminPasswd=admin
+      - spring.datasource.address=192.168.2.218:33066
+      - spring.datasource.database=canal_manager
+      - spring.datasource.username=root
+      - spring.datasource.password=root
 
-#
-#  canal-server:
-#    image: canal/canal-server:v1.1.5
-#    restart: always
-#    container_name: canal-server
-#    networks:
-#      - zk-net
-#    ports:
-#      - "2183:2181"
-#    volumes:
-#      - ./canal/canal-server/conf:conf
-#      - ./canal/canal-server/logs:logs
-#    environment:
-#      ZOO_MY_ID: 3
-#      ZOO_SERVERS: server.1=zk-1:2888:3888;2181 server.2=zk-2:2888:3888;2181 server.3=zk-3:2888:3888;2181
-#
-
-
+  canal-server:
+    image: canal/canal-server:v1.1.5
+    container_name: canal-server
+    ports:
+      - "11111:11111"
+      - "11112:11112"
+    environment:
+      - canal.admin.manager=192.168.2.218:8089
+      - canal.register.ip=192.168.2.218
+      - canal.admin.port=11110
+      - canal.admin.user=admin
+      - canal.admin.passwd=4ACFE3202A5FF5CF467898FC58AAB1D615029441
+      - canal.admin.register.auto=true
+      - canal.admin.register.cluster=zk
+      - canal.admin.register.name=Canal-android-1
+    volumes:
+      - ./canal/canal-server/logs/:/home/admin/canal-server/logs/
 
 networks:
   zk-net:
